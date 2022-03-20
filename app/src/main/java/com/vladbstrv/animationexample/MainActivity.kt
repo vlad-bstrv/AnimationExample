@@ -10,6 +10,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.TextView
+import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.transition.*
 import com.vladbstrv.animationexample.databinding.ActivityMainBinding
@@ -19,23 +21,29 @@ import com.vladbstrv.animationexample.databinding.ActivityMainZoomBinding
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityMainPathBinding
+    lateinit var binding: ActivityMainBinding
     private var flag = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainPathBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.button.setOnClickListener {
+        val titles: MutableList<String> = ArrayList()
+        repeat(11) {
+            titles.add("item $it")
+        }
 
-            val changeBounds = ChangeBounds()
-            changeBounds.duration = 5000
-            changeBounds.setPathMotion(ArcMotion())
-            TransitionManager.beginDelayedTransition(binding.root, changeBounds)
-            flag = !flag
-            val params = binding.button.layoutParams as FrameLayout.LayoutParams
-            params.gravity = if(flag) Gravity.BOTTOM or Gravity.END else Gravity.START or Gravity.TOP
-            binding.button.layoutParams = params
+        binding.button.setOnClickListener {
+            TransitionManager.beginDelayedTransition(binding.transitionContainer)
+            titles.shuffle()
+            binding.transitionContainer.removeAllViews()
+            titles.forEach{ title: String ->
+                binding.transitionContainer.addView(TextView(this).apply {
+                    text = title
+                    ViewCompat.setTransitionName(this, title)
+                })
+
+            }
         }
     }
 
